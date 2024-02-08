@@ -9,8 +9,7 @@
 
 int lastTask = 0;
 int getNextTaskID() {
-    lastTask ++;
-    return lastTask + 1;
+    return lastTask ++;
 }
 std::string readableTime(long epochTime) {
     std::time_t time = epochTime;
@@ -51,6 +50,7 @@ long getCurrentTime() {
 ExecutableTask::ExecutableTask(long start_time) {
     this->id = getNextTaskID();
     this->first_execution = start_time;
+    this->recurring = false;
 }
 ExecutableTask::ExecutableTask(long start_time,long interval) {
     this->id = getNextTaskID();
@@ -58,36 +58,38 @@ ExecutableTask::ExecutableTask(long start_time,long interval) {
     this->interval = interval;
     this->first_execution = start_time;
 }
-int ExecutableTask::getId() const {
+int ExecutableTask::getId() {
     return this->id;
 }
-bool ExecutableTask::isRecurring() const {
+bool ExecutableTask::isRecurring() {
     return this->recurring;
 }
-long ExecutableTask::getInterval() const {
+long ExecutableTask::getInterval() {
     return this->interval;
 }
 void ExecutableTask::cancel() {
     std::cout << "Task " << this->getId() << " cancelled." << std::endl;
     this->cancelled = true;
 }
-long ExecutableTask::getStartTime() const {
+long ExecutableTask::getStartTime() {
     return this->first_execution;
 }
 void ExecutableTask::execute() {
-    if(this->isCancelled()){return;}
-    if(this->isComplete()){return;}
+    if(isCancelled())return;
+    if(isComplete()) return;
+
     std::cout << "Task " << this->getId() << " executed successfully." << std::endl;
-    if(isRecurring()) {
+    if(this->recurring) {
         this->first_execution += this->interval;
     } else {
-        this->complete = true;
+        complete = true;
     }
 }
-bool ExecutableTask::isCancelled() const {
-    return this->cancelled;
+
+bool ExecutableTask::isCancelled() {
+    return cancelled;
 }
-bool ExecutableTask::isComplete() const {
+bool ExecutableTask::isComplete() {
     return this->complete;
 }
 

@@ -58,24 +58,22 @@ long getTime(int day, int hour, int minute, int second);
  */
 long getCurrentTime();
 
-
-
 class ExecutableTask {
 public:
-    explicit ExecutableTask(long start_time);
+    ExecutableTask(long start_time);
     ExecutableTask(long start_time,long interval);
-    int getId() const;
-    bool isRecurring() const;
-    long getInterval() const;
+    int getId();
+    bool isRecurring();
+    long getInterval();
     void cancel();
-    long getStartTime() const;
+    long getStartTime();
     void execute();
-    bool isCancelled() const;
-    bool isComplete() const;
-protected:
+    bool isCancelled();
+    bool isComplete();
+private:
     int id;
     long first_execution;
-    long interval{};
+    long interval;
     bool complete = false;
     bool cancelled = false;
     bool recurring = false;

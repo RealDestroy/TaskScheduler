@@ -1,24 +1,20 @@
-
-
 #include <iostream>
 #include <vector>
 #include "Tasks.h"
 
 int main() {
-    std::vector<ExecutableTask> tasks;
-    ExecutableTask t1(getTime(2024,2,7,15,26,0));
-    //std::cout << "Current Time: " << readableTime(getCurrentTime()) << std::endl;
-    //std::cout << "Time: " << readableTime(t1.getStartTime()) << std::endl;
-    //std::cout << "diff: " << t1.getStartTime() - getCurrentTime() << std::endl;
-    tasks.push_back(t1);
+    std::vector<ExecutableTask*> tasks;
+    ExecutableTask t1(getTime(2024,2,7,20,14,0));
+    ExecutableTask t2(getTime(2024,2,7,22,15,0));
 
+    tasks.push_back(&t1);
+    tasks.push_back(&t2);
 
-    while (true) {
-        for(ExecutableTask task : tasks) {
+    while(true) {
+        for(auto task : tasks) {
             long time = getCurrentTime();
-            std::cout << readableTime(time) << std::endl;
-            if(task.getStartTime() <= time) {
-                task.execute();
+            if(task->getStartTime() <= time) {
+                task->execute();
             }
         }
         sleep(1);
