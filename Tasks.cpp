@@ -47,36 +47,63 @@ long getCurrentTime() {
     return desiredTime + CST;
 }
 
-ExecutableTask::ExecutableTask(long start_time) {
+Command::Command(Command_Type type, int device_id) {
+    this->commandType = type;
+    this->device_id = device_id;
+}
+Command_Type Command::getCommandType() {
+    return commandType;
+}
+int Command::getDeviceId() const {
+    return device_id;
+}
+
+Command::Command() {
+    device_id = -1;
+    commandType = Toggle;
+}
+
+/**
+ * Sends the command via MQTT to the ESP32 to trigger the light
+ */
+void Command::sendToMQTT() const {
+    //more code
+    std::cout << "Command sent via MQTT to device " << getDeviceId() << std::endl;
+}
+
+ExecutableTask::ExecutableTask(long start_time, Command& command) {
+    this->command = command;
     this->id = getNextTaskID();
+    this->recurring = true;
     this->first_execution = start_time;
 }
-ExecutableTask::ExecutableTask(long start_time,long interval) {
+ExecutableTask::ExecutableTask(long start_time, long interval, Command& command) {
+    this->command = command;
     this->id = getNextTaskID();
     this->recurring = true;
     this->interval = interval;
     this->first_execution = start_time;
 }
-int ExecutableTask::getId() {
+int ExecutableTask::getId() const {
     return this->id;
 }
-bool ExecutableTask::isRecurring() {
+bool ExecutableTask::isRecurring() const {
     return this->recurring;
 }
-long ExecutableTask::getInterval() {
+long ExecutableTask::getInterval() const {
     return this->interval;
 }
 void ExecutableTask::cancel() {
     std::cout << "Task " << this->getId() << " cancelled." << std::endl;
     this->cancelled = true;
 }
-long ExecutableTask::getStartTime() {
+long ExecutableTask::getStartTime() const {
     return this->first_execution;
 }
 void ExecutableTask::execute() {
     if(isCancelled())return;
     if(isComplete()) return;
-
+    command.sendToMQTT();
     std::cout << "Task " << this->getId() << " executed successfully." << std::endl;
     if(isRecurring()) {
         first_execution += interval;
@@ -90,10 +117,17 @@ void ExecutableTask::execute() {
     }
 }
 
-bool ExecutableTask::isCancelled() {
+bool ExecutableTask::isCancelled() const {
     return cancelled;
 }
-bool ExecutableTask::isComplete() {
+bool ExecutableTask::isComplete() const {
     return this->complete;
 }
+Command& ExecutableTask::getCommand() {
+    return command;
+}
+
+
+
+
 

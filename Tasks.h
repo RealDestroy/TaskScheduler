@@ -57,26 +57,50 @@ long getTime(int day, int hour, int minute, int second);
  * @return return the current epoch time in CST
  */
 long getCurrentTime();
+enum Command_Type {
+    Toggle,ON,OFF
+};
+
+class Command {
+public:
+    Command(Command_Type type,int device_id);
+    Command();
+
+    int getDeviceId() const;
+    Command_Type getCommandType();
+    void sendToMQTT() const;
+private:
+    int device_id;
+    Command_Type commandType;
+};
 
 class ExecutableTask {
 public:
-    ExecutableTask(long start_time);
-    ExecutableTask(long start_time,long interval);
-    int getId();
-    bool isRecurring();
-    long getInterval();
+    ExecutableTask(long start_time,Command& command);
+    ExecutableTask(long start_time,long interval,Command& command);
+    int getId() const;
+    bool isRecurring() const;
+    long getInterval() const;
     void cancel();
-    long getStartTime();
+    long getStartTime() const;
     void execute();
-    bool isCancelled();
-    bool isComplete();
+    bool isCancelled() const;
+    bool isComplete() const;
+    Command& getCommand();
 private:
     int id;
+    Command command;
     long first_execution;
-    long interval;
+    long interval{};
     bool complete = false;
     bool cancelled = false;
     bool recurring = false;
 };
+
+
+
+
+
+
 
 
