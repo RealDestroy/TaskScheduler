@@ -18,8 +18,7 @@ int main() {
 
     while(true) {
         for(auto task : tasks) {
-            long time = getCurrentTime(CST);
-            if (task->getStartTime() == time) {
+            if(task->canExecute()){
                 task->execute();
             }
         }

@@ -106,6 +106,11 @@ Command& ExecutableTask::getCommand() {
     return command;
 }
 
+bool ExecutableTask::canExecute() const {
+    long time = getCurrentTime(getTimeZone());
+    return time == getStartTime();
+}
+
 
 
 

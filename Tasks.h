@@ -50,6 +50,7 @@ public:
     bool isComplete() const;
     Command& getCommand();
     int getTimeZone() const;
+    bool canExecute() const;
 private:
     int id;
     Command command;
