@@ -21,7 +21,7 @@ std::string readableTime(long epochTime) {
 long getTime(int year, int month, int day, int hour, int minute, int second) {
     struct tm timeinfo{};
     timeinfo.tm_year = year - 1900; // Years since 1900
-    timeinfo.tm_mon = month - 1;     // Month (0 - 11)
+    timeinfo.tm_mon = month;     // Month (0 - 11)
     timeinfo.tm_mday = day;          // Day of the month (1 - 31)
     timeinfo.tm_hour = hour;         // Hour (0 - 23)
     timeinfo.tm_min = minute;        // Minute (0 - 59)
@@ -35,7 +35,7 @@ long getTime(int year, int month, int day, int hour, int minute, int second) {
 long getTime(int day, int hour, int minute, int second) {
     time_t now = time(nullptr); // Get the current time
     struct tm* localTime = localtime(&now); // Convert to local time
-    return getTime(localTime->tm_year + 1900,localTime->tm_mon + 1, day,hour,minute,second);
+    return getTime(localTime->tm_year + 1900,localTime->tm_mon, day,hour,minute,second);
 }
 long getCurrentTime() {
     // Get the current time
