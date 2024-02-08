@@ -7,6 +7,12 @@
 
 #endif //TASKSCHEDULER_DATEUTILITY_H
 
+#define HST  (-36000)
+#define AKST (-32400)
+#define PST  (-28800)
+#define MST  (-25200)
+#define CST  (-21600)
+#define EST  (-18000)
 
 #define SUNDAY 0
 #define MONDAY 1
@@ -28,3 +34,58 @@
 #define OCTOBER 9
 #define NOVEMBER 10
 #define DECEMBER 11
+
+/**
+ *
+ * @param epochTime
+ * @return a formatted time string
+ */
+std::string readableTime(long epochTime);
+
+/**
+ *
+ * @param year
+ * @param month
+ * @param day
+ * @param hour
+ * @param minute
+ * @param second
+ * @return return a modified epoch time in CST
+ */
+long getTime(int year, int month, int day, int hour, int minute, int second,int timezone);
+/**
+ *
+ * @param year
+ * @param month
+ * @param day
+ * @param hour
+ * @param minute
+ * @param second
+ * @return return a modified epoch time in CST
+ */
+long getTime(int day, int hour, int minute, int second,int timezone);
+/**
+ *
+ * @param year
+ * @param month
+ * @param day
+ * @param hour
+ * @param minute
+ * @param second
+ * @return return the current epoch time in CST
+ */
+long getCurrentTime(int timezone);
+class TimeInfo {
+public:
+    TimeInfo();
+    explicit TimeInfo(int timezone);
+    TimeInfo(int day,int hour,int min,int sec,int timezone);
+    TimeInfo(int year,int month,int day,int hour,int min,int sec,int timezone);
+    int getTimeZone() const;
+    long getEpoch() const;
+    void modify(long add);
+private:
+    long epoch;
+    int timezone;
+};
+
