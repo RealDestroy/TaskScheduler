@@ -13,7 +13,6 @@
 #include <fstream>
 #include <sstream>
 #include <unistd.h>
-#include <ctime>
 #include <thread>
 #include <vector>
 #include "DateUtility.h"
@@ -39,8 +38,8 @@ private:
 
 class ExecutableTask {
 public:
-    ExecutableTask(TimeInfo execution_time,Command& command);
-    ExecutableTask(TimeInfo execution_time,long interval,Command& command);
+    ExecutableTask(TimeInfo& execution_time,Command& command);
+    ExecutableTask(TimeInfo& execution_time,long interval,Command& command);
     int getId() const;
     bool isRecurring() const;
     long getInterval() const;
@@ -54,7 +53,7 @@ public:
 private:
     int id;
     Command command;
-    TimeInfo execution_time;
+    TimeInfo* execution_time;
     long interval;
     bool complete = false;
     bool cancelled = false;

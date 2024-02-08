@@ -14,6 +14,7 @@ int getNextTaskID() {
 
 
 
+
 Command::Command(Command_Type type, int device_id) {
     this->commandType = type;
     this->device_id = device_id;
@@ -38,18 +39,26 @@ void Command::sendToMQTT() const {
     std::cout << "Command sent via MQTT to device " << getDeviceId() << std::endl;
 }
 
-ExecutableTask::ExecutableTask(TimeInfo execution_time, Command& command) {
+ExecutableTask::ExecutableTask(TimeInfo& execution_time, Command& command) {
     this->command = command;
     this->id = getNextTaskID();
     this->recurring = true;
-    this->execution_time = execution_time;
+    this->execution_time = &execution_time;
 }
-ExecutableTask::ExecutableTask(TimeInfo execution_time, long interval, Command& command) {
+ExecutableTask::ExecutableTask(TimeInfo& execution_time, long interval, Command& command) {
     this->command = command;
     this->id = getNextTaskID();
     this->recurring = true;
     this->interval = interval;
-    this->execution_time = execution_time;
+    this->execution_time = &execution_time;
+    //catch up to current time
+    if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+        std::cout << "Time is less than current time" << std::endl;
+        while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+            execution_time.modify(interval);
+        }
+        std::cout << "Next run " << readableTime(execution_time.getEpoch()) << std::endl;
+    }
 }
 int ExecutableTask::getId() const {
     return this->id;
@@ -65,7 +74,7 @@ void ExecutableTask::cancel() {
     this->cancelled = true;
 }
 long ExecutableTask::getStartTime() const {
-    return this->execution_time.getEpoch();
+    return this->execution_time->getEpoch();
 }
 void ExecutableTask::execute() {
     if(isCancelled())return;
@@ -73,10 +82,11 @@ void ExecutableTask::execute() {
     command.sendToMQTT();
     std::cout << "Task " << this->getId() << " executed successfully." << std::endl;
     if(isRecurring()) {
-        execution_time.modify(interval);
-        if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-            while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-                execution_time.modify(interval);
+        execution_time->modify(interval);
+        //catch up to current time
+        if (execution_time->getEpoch() < getCurrentTime(getTimeZone())) {
+            while(execution_time->getEpoch() < getCurrentTime(getTimeZone())) {
+                execution_time->modify(interval);
             }
         }
     } else {
@@ -84,7 +94,7 @@ void ExecutableTask::execute() {
     }
 }
 int ExecutableTask::getTimeZone() const {
-    return execution_time.getTimeZone();
+    return execution_time->getTimeZone();
 }
 bool ExecutableTask::isCancelled() const {
     return cancelled;
@@ -95,6 +105,7 @@ bool ExecutableTask::isComplete() const {
 Command& ExecutableTask::getCommand() {
     return command;
 }
+
 
 
 
