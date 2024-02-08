@@ -50,7 +50,6 @@ long getCurrentTime() {
 ExecutableTask::ExecutableTask(long start_time) {
     this->id = getNextTaskID();
     this->first_execution = start_time;
-    this->recurring = false;
 }
 ExecutableTask::ExecutableTask(long start_time,long interval) {
     this->id = getNextTaskID();
@@ -79,8 +78,13 @@ void ExecutableTask::execute() {
     if(isComplete()) return;
 
     std::cout << "Task " << this->getId() << " executed successfully." << std::endl;
-    if(this->recurring) {
-        this->first_execution += this->interval;
+    if(isRecurring()) {
+        first_execution += interval;
+        if (first_execution < getCurrentTime()) {
+            while(first_execution < getCurrentTime()) {
+                first_execution += interval;
+            }
+        }
     } else {
         complete = true;
     }
