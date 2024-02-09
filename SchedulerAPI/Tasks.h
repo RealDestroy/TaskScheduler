@@ -51,6 +51,7 @@ public:
     Command& getCommand();
     int getTimeZone() const;
     bool canExecute() const;
+    bool isPastExecution() const;
 private:
     int id;
     Command command;
