@@ -1,9 +1,11 @@
 //
 // Created by destroy on 2/7/24.
 //
-
+#define _GLIBCXX_USE_NANOSLEEP
 #include "Tasks.h"
 #include <iostream>
+#include <string>
+#include <thread>
 
 
 
@@ -116,8 +118,14 @@ bool ExecutableTask::isPastExecution() const {
     return time > getStartTime();
 }
 
+void ExecutableTask::log() {
+    //log successful executions and if a task is past execution time without having executed.
+}
 
 
+
+//    auto target_time = std::chrono::system_clock::from_time_t(getStartTime());
+//    std::this_thread::sleep_until(target_time);
 
 
 

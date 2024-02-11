@@ -8,4 +8,6 @@ add_executable(TaskScheduler main.cpp
         SchedulerAPI/Tasks.h
         SchedulerAPI/DateUtility.h
         SchedulerAPI/DateUtility.cpp
+        SchedulerAPI/TaskScheduler.cpp
+        SchedulerAPI/TaskScheduler.h
 )
