@@ -13,8 +13,6 @@
 #include <fstream>
 #include <sstream>
 #include <unistd.h>
-#include <thread>
-#include <vector>
 #include "DateUtility.h"
 
 
@@ -46,11 +44,13 @@ public:
     void cancel();
     long getStartTime() const;
     void execute();
+    void log();
     bool isCancelled() const;
     bool isComplete() const;
     Command& getCommand();
     int getTimeZone() const;
     bool canExecute() const;
+    bool isPastExecution() const;
 private:
     int id;
     Command command;
@@ -60,6 +60,8 @@ private:
     bool cancelled = false;
     bool recurring = false;
 };
+
+
 
 
 

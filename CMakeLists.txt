@@ -4,7 +4,10 @@ project(TaskScheduler)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(TaskScheduler main.cpp
-        Tasks.cpp
-        Tasks.h
-        DateUtility.h
-        DateUtility.cpp)
+        SchedulerAPI/Tasks.cpp
+        SchedulerAPI/Tasks.h
+        SchedulerAPI/DateUtility.h
+        SchedulerAPI/DateUtility.cpp
+        SchedulerAPI/TaskScheduler.cpp
+        SchedulerAPI/TaskScheduler.h
+)
