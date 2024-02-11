@@ -7,4 +7,4 @@ Creates a list of tasks and executes them at their specified time, tasks can be 
 - Tasks are executed in the order in which they were added
 - When a task which is not recurring is complete, it is removed
 
-- In the more recent updates, the main schedule loop runs on its own thread while othe utilities will have their own threads.
+- In the more recent updates, the main schedule loop runs on its own thread while other utilities will have their own threads.
