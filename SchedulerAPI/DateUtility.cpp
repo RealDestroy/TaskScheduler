@@ -11,7 +11,9 @@ std::string readableTime(const long epochTime) {
     oss << std::put_time(tmPtr, "%Y-%m-%d %H:%M:%S");
     return oss.str();
 }
-
+std::string getCurrentTimeReadable(const int timezone) {
+    return readableTime(getCurrentTime(timezone));
+}
 long getCurrentTime(const int timezone) {
     // Get the current time
     auto now = std::chrono::system_clock::now();
@@ -42,6 +44,10 @@ TimeInfo::TimeInfo() {
 
     this->epoch = desiredTime + timezone;
     this->timezone = CST;
+}
+TimeInfo::TimeInfo(unsigned long long epoch, int timezone) {
+    this->epoch = epoch;
+    this->timezone = timezone;
 }
 TimeInfo::TimeInfo(const int day,const int hour,const int min,const int sec,const int timezone) {
     time_t now = time(nullptr); // Get the current time
@@ -75,7 +81,7 @@ TimeInfo::TimeInfo(const int year,const int month,const int day,const int hour,c
 }
 
 
-long TimeInfo::getEpoch() const {
+unsigned long long TimeInfo::getEpoch() const {
     return epoch;
 }
 
@@ -86,5 +92,7 @@ int TimeInfo::getTimeZone() const {
 void TimeInfo::modify(const long add) {
     epoch += add;
 }
+
+
 
 

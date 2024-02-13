@@ -32,6 +32,18 @@ Command::Command() {
     device_id = -1;
     commandType = Toggle;
 }
+Command_Type Command::getType(const std::string& cmd_type) {
+    if(cmd_type == "Toggle") {
+        return Toggle;
+    }
+    if(cmd_type == "OFF") {
+        return OFF;
+    }
+    if(cmd_type == "ON") {
+        return OFF;
+    }
+    return Toggle;
+}
 
 /**
  * Sends the command via MQTT to the ESP32 to trigger the light
@@ -42,15 +54,13 @@ void Command::sendToMQTT() const {
 }
 
 ExecutableTask::ExecutableTask(TimeInfo& execution_time, Command& command) {
-    this->command = command;
+    this->command = &command;
     this->id = getNextTaskID();
-    this->recurring = true;
     this->execution_time = &execution_time;
 }
-ExecutableTask::ExecutableTask(TimeInfo& execution_time, long interval, Command& command) {
-    this->command = command;
+ExecutableTask::ExecutableTask(TimeInfo& execution_time, unsigned long long interval, Command& command) {
+    this->command = &command;
     this->id = getNextTaskID();
-    this->recurring = true;
     this->interval = interval;
     this->execution_time = &execution_time;
     //catch up to current time
@@ -62,26 +72,26 @@ ExecutableTask::ExecutableTask(TimeInfo& execution_time, long interval, Command&
         std::cout << "Next run " << readableTime(execution_time.getEpoch()) << std::endl;
     }
 }
-int ExecutableTask::getId() const {
+unsigned long ExecutableTask::getId() const {
     return this->id;
 }
 bool ExecutableTask::isRecurring() const {
-    return this->recurring;
+    return this->interval > 0;
 }
-long ExecutableTask::getInterval() const {
+unsigned long ExecutableTask::getInterval() const {
     return this->interval;
 }
 void ExecutableTask::cancel() {
     std::cout << "Task " << this->getId() << " cancelled." << std::endl;
     this->cancelled = true;
 }
-long ExecutableTask::getStartTime() const {
+unsigned long long ExecutableTask::getStartTime() const {
     return this->execution_time->getEpoch();
 }
 void ExecutableTask::execute() {
     if(isCancelled())return;
     if(isComplete()) return;
-    command.sendToMQTT();
+    command->sendToMQTT();
     std::cout << "Task " << this->getId() << " executed successfully." << std::endl;
     if(isRecurring()) {
         execution_time->modify(interval);
@@ -104,7 +114,7 @@ bool ExecutableTask::isCancelled() const {
 bool ExecutableTask::isComplete() const {
     return this->complete;
 }
-Command& ExecutableTask::getCommand() {
+Command* ExecutableTask::getCommand() const {
     return command;
 }
 
@@ -121,6 +131,19 @@ bool ExecutableTask::isPastExecution() const {
 void ExecutableTask::log() {
     //log successful executions and if a task is past execution time without having executed.
 }
+
+std::string ExecutableTask::string() const {
+    //"id:time_zone:start_time:interval:command_type:remote_device"
+    std::string s =
+              std::to_string(getId()) + ":"
+            + std::to_string(getTimeZone()) + ":"
+            + std::to_string(getStartTime()) + ":"
+            + std::to_string(getInterval()) + ":"
+            + std::to_string(getCommand()->getCommandType()) + ":"
+            + std::to_string(getCommand()->getDeviceId());
+    return s;
+}
+
 
 
 
