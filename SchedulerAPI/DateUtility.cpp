@@ -89,7 +89,7 @@ int TimeInfo::getTimeZone() const {
     return timezone;
 }
 
-void TimeInfo::modify(const long add) {
+void TimeInfo::modify(const unsigned long long add) {
     epoch += add;
 }
 

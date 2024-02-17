@@ -93,7 +93,7 @@ public:
     TimeInfo(int year,int month,int day,int hour,int min,int sec,int timezone);
     int getTimeZone() const;
     unsigned long long getEpoch() const;
-    void modify(long add);
+    void modify(unsigned long long add);
 private:
     long long epoch;
     int timezone;

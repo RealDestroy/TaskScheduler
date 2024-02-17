@@ -52,6 +52,19 @@ void Command::sendToMQTT() const {
     //more code
     std::cout << "Command sent via MQTT to device " << getDeviceId() << std::endl;
 }
+ExecutableTask::ExecutableTask(unsigned int id, TimeInfo &execution_time, unsigned long long int interval, Command &command) {
+    this->command = &command;
+    this->id = getNextTaskID();
+    this->interval = interval;
+    this->id = id;
+    this->execution_time = &execution_time;
+    //catch up to current time
+    if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+        while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+            execution_time.modify(interval);
+        }
+    }
+}
 
 ExecutableTask::ExecutableTask(TimeInfo& execution_time, Command& command) {
     this->command = &command;
@@ -65,14 +78,12 @@ ExecutableTask::ExecutableTask(TimeInfo& execution_time, unsigned long long inte
     this->execution_time = &execution_time;
     //catch up to current time
     if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-        std::cout << "Time is less than current time" << std::endl;
         while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
             execution_time.modify(interval);
         }
-        std::cout << "Next run " << readableTime(execution_time.getEpoch()) << std::endl;
     }
 }
-unsigned long ExecutableTask::getId() const {
+unsigned int ExecutableTask::getId() const {
     return this->id;
 }
 bool ExecutableTask::isRecurring() const {
@@ -143,6 +154,9 @@ std::string ExecutableTask::string() const {
             + std::to_string(getCommand()->getDeviceId());
     return s;
 }
+
+
+
 
 
 

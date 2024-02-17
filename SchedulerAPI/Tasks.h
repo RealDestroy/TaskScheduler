@@ -40,7 +40,8 @@ class ExecutableTask {
 public:
     ExecutableTask(TimeInfo& execution_time,Command& command);
     ExecutableTask(TimeInfo& execution_time,unsigned long long interval,Command& command);
-    unsigned long getId() const;
+    ExecutableTask(unsigned int id, TimeInfo& execution_time,unsigned long long interval,Command& command);
+    unsigned int getId() const;
     bool isRecurring() const;
     unsigned long getInterval() const;
     void cancel();
@@ -58,7 +59,7 @@ private:
     unsigned long id;
     Command* command;
     TimeInfo* execution_time;
-    unsigned long interval;
+    unsigned long interval{};
     bool complete = false;
     bool cancelled = false;
 };

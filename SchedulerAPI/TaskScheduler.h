@@ -27,15 +27,19 @@ public:
     void add(ExecutableTask& task);
     void start();
     void stop();
-    static ExecutableTask& parsePacket(std::string& packet);
+    void save();
+    static ExecutableTask parsePacket(std::string& packet);
     static std::string cwd();
-    static void readInSchedules();
+    void readInSchedules();
 private:
     void loop();
+    void task_handler();
     std::mutex taskLock;
     std::vector<ExecutableTask*> tasks;
     std::vector<unsigned int> task_ids;
     bool HALT_SCHEDULER = false;
     std::thread MAIN_THREAD;
     std::thread UTILITY_THREAD;
+protected:
+    static std::string file();
 };
