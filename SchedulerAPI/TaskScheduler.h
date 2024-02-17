@@ -33,7 +33,7 @@ public:
     void readInSchedules();
 private:
     void loop();
-    void task_handler();
+    void task_handler() const;
     std::mutex taskLock;
     std::vector<ExecutableTask*> tasks;
     std::vector<unsigned int> task_ids;

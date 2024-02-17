@@ -16,7 +16,7 @@ void TaskScheduler::loop() {
         std::this_thread::sleep_for(std::chrono::seconds(1)); //sleep loop for 1 second
     }
 }
-void TaskScheduler::task_handler() {
+void TaskScheduler::task_handler() const {
     Command cmd1(Toggle,10);
     Command cmd2(Toggle,11);
     TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
@@ -79,10 +79,10 @@ void TaskScheduler::save() {
     doc.SetObject();
     doc.AddMember(TASK_IDS, task_ids.size(), doc.GetAllocator());
     for(ExecutableTask* task : tasks) {
-        rapidjson::GenericValue<rapidjson::UTF8<>> key;
+        rapidjson::Value key;
         std::string id_s = std::to_string(task->getId());
         key.SetString(id_s.c_str(),doc.GetAllocator());
-        rapidjson::GenericValue<rapidjson::UTF8<>> value;
+        rapidjson::Value value;
         std::string s = task->string();
         value.SetString(s.c_str(),s.length());
         doc.AddMember(key,value, doc.GetAllocator());
