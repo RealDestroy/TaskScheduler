@@ -45,7 +45,12 @@
  * @return a formatted time string
  */
 std::string readableTime(long epochTime);
-
+/**
+ *
+ * @param timezone
+ * @return the current time formatted in a string
+ */
+std::string getCurrentTimeReadable(const int timezone);
 /**
  *
  * @param year
@@ -83,13 +88,14 @@ class TimeInfo {
 public:
     TimeInfo();
     explicit TimeInfo(int timezone);
+    TimeInfo(unsigned long long epoch, int timezone);
     TimeInfo(int day,int hour,int min,int sec,int timezone);
     TimeInfo(int year,int month,int day,int hour,int min,int sec,int timezone);
     int getTimeZone() const;
-    long getEpoch() const;
-    void modify(long add);
+    unsigned long long getEpoch() const;
+    void modify(unsigned long long add);
 private:
-    long epoch;
+    long long epoch;
     int timezone;
 };
 
