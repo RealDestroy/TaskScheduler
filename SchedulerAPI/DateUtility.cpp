@@ -3,7 +3,24 @@
 //
 
 #include "DateUtility.h"
-
+int getCurrentMonth() {
+    time_t now = time(nullptr);
+    struct tm *localTime = localtime(&now);
+    return localTime->tm_mon;
+}
+int getCurrentYear() {
+    time_t now = time(nullptr);
+    struct tm *localTime = localtime(&now);
+    return localTime->tm_year;
+}
+int getNextMonthDay(int day_of_week) {
+    time_t now = time(nullptr);
+    struct tm *localTime = localtime(&now);
+    int currentDay = localTime->tm_wday;
+    int daysUntilTuesday = (day_of_week - currentDay + 7) % 7;
+    localTime->tm_mday += daysUntilTuesday;
+    return localTime->tm_mday;
+}
 std::string readableTime(const long epochTime) {
     std::time_t time = epochTime;
     std::tm* tmPtr = std::gmtime(&time); // Convert to UTC time
@@ -11,28 +28,29 @@ std::string readableTime(const long epochTime) {
     oss << std::put_time(tmPtr, "%Y-%m-%d %H:%M:%S");
     return oss.str();
 }
-std::string getCurrentTimeReadable(const int timezone) {
-    return readableTime(getCurrentTime(timezone));
+std::string getCurrentTimeReadable(const int tzone) {
+    return readableTime(getCurrentTime(tzone));
 }
-long getCurrentTime(const int timezone) {
+long getCurrentTime(const int tzone) {
+    // Get the current time
+    auto now = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
+
+    std::tm* currentDateTime = std::localtime(&currentTime);
+
+    std::time_t desiredTime = std::mktime(currentDateTime);
+    return desiredTime + tzone;
+}
+TimeInfo::TimeInfo(int tzone) {
     // Get the current time
     auto now = std::chrono::system_clock::now();
     std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
 
     std::tm* currentDateTime = std::localtime(&currentTime);
     std::time_t desiredTime = std::mktime(currentDateTime);
-    return desiredTime + timezone;
-}
-TimeInfo::TimeInfo(int timezone) {
-    // Get the current time
-    auto now = std::chrono::system_clock::now();
-    std::time_t currentTime = std::chrono::system_clock::to_time_t(now);
 
-    std::tm* currentDateTime = std::localtime(&currentTime);
-    std::time_t desiredTime = std::mktime(currentDateTime);
-
-    this->epoch = desiredTime + timezone;
-    this->timezone = timezone;
+    this->epoch = desiredTime + tzone;
+    this->timezone = tzone;
 }
 TimeInfo::TimeInfo() {
     // Get the current time
@@ -45,11 +63,11 @@ TimeInfo::TimeInfo() {
     this->epoch = desiredTime + timezone;
     this->timezone = CST;
 }
-TimeInfo::TimeInfo(unsigned long long epoch, int timezone) {
+TimeInfo::TimeInfo(unsigned long long epoch, int tzone) {
     this->epoch = epoch;
-    this->timezone = timezone;
+    this->timezone = tzone;
 }
-TimeInfo::TimeInfo(const int day,const int hour,const int min,const int sec,const int timezone) {
+TimeInfo::TimeInfo(const int day,const int hour,const int min,const int sec,const int tzone) {
     time_t now = time(nullptr); // Get the current time
     struct tm* localTime = localtime(&now); // Convert to local time
     struct tm timeinfo{};
@@ -62,10 +80,10 @@ TimeInfo::TimeInfo(const int day,const int hour,const int min,const int sec,cons
     timeinfo.tm_isdst = 0;           // Daylight Saving Time flag
 
     time_t local_time = mktime(&timeinfo); // Convert to local time
-    this->epoch = local_time + timezone;
-    this->timezone = timezone;
+    this->epoch = local_time + tzone;
+    this->timezone = tzone;
 }
-TimeInfo::TimeInfo(const int year,const int month,const int day,const int hour,const int min,const int sec,const int timezone) {
+TimeInfo::TimeInfo(const int year,const int month,const int day,const int hour,const int min,const int sec,const int tzone) {
     struct tm timeinfo{};
     timeinfo.tm_year = year - 1900; // Years since 1900
     timeinfo.tm_mon = month;     // Month (0 - 11)
@@ -76,8 +94,9 @@ TimeInfo::TimeInfo(const int year,const int month,const int day,const int hour,c
     timeinfo.tm_isdst = 0;           // Daylight Saving Time flag
 
     time_t local_time = mktime(&timeinfo); // Convert to local time
-    this->epoch = local_time + timezone;
-    this->timezone = timezone;
+
+    this->epoch = local_time + tzone;
+    this->timezone = tzone;
 }
 
 
@@ -92,6 +111,8 @@ int TimeInfo::getTimeZone() const {
 void TimeInfo::modify(const unsigned long long add) {
     epoch += add;
 }
+
+
 
 
 

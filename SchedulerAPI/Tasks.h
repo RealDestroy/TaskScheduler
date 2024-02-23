@@ -21,7 +21,6 @@
 enum Command_Type {
     Toggle,ON,OFF
 };
-
 class Command {
 public:
     Command(Command_Type type,int device_id);
@@ -29,7 +28,8 @@ public:
 
     int getDeviceId() const;
     Command_Type getCommandType();
-    static Command_Type getType(const std::string& cmd_type);
+    int getCommandTypeInt();
+    static Command_Type getCommandTypeOf(int command_type_int);
     void sendToMQTT() const;
 private:
     int device_id;

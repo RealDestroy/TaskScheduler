@@ -39,6 +39,14 @@
 #define NOVEMBER 10
 #define DECEMBER 11
 
+int getCurrentMonth();
+int getCurrentYear();
+/**
+ *
+ * @param day_of_week
+ * @return gets the next month day based on a weekday
+ */
+int getNextMonthDay(int day_of_week);
 /**
  *
  * @param epochTime
@@ -50,7 +58,7 @@ std::string readableTime(long epochTime);
  * @param timezone
  * @return the current time formatted in a string
  */
-std::string getCurrentTimeReadable(const int timezone);
+std::string getCurrentTimeReadable(int tzone);
 /**
  *
  * @param year
@@ -61,7 +69,7 @@ std::string getCurrentTimeReadable(const int timezone);
  * @param second
  * @return return a modified epoch time in CST
  */
-long getTime(int year, int month, int day, int hour, int minute, int second,int timezone);
+long getTime(int year, int month, int day, int hour, int minute, int second,int tzone);
 /**
  *
  * @param year
@@ -72,7 +80,7 @@ long getTime(int year, int month, int day, int hour, int minute, int second,int 
  * @param second
  * @return return a modified epoch time in CST
  */
-long getTime(int day, int hour, int minute, int second,int timezone);
+long getTime(int day, int hour, int minute, int second,int tzone);
 /**
  *
  * @param year
@@ -83,19 +91,19 @@ long getTime(int day, int hour, int minute, int second,int timezone);
  * @param second
  * @return return the current epoch time in CST
  */
-long getCurrentTime(int timezone);
+long getCurrentTime(int tzone);
 class TimeInfo {
 public:
     TimeInfo();
     explicit TimeInfo(int timezone);
     TimeInfo(unsigned long long epoch, int timezone);
     TimeInfo(int day,int hour,int min,int sec,int timezone);
-    TimeInfo(int year,int month,int day,int hour,int min,int sec,int timezone);
+    TimeInfo(int year,int month,int day,int hour,int min,int sec,int tzone);
     int getTimeZone() const;
     unsigned long long getEpoch() const;
     void modify(unsigned long long add);
 private:
-    long long epoch;
+    unsigned long long epoch;
     int timezone;
 };
 

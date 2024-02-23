@@ -12,6 +12,8 @@
 #include <vector>
 
 
-namespace JSONUtility {
+namespace SchedulerUtil {
     std::vector<std::string> split(const std::string& s, const std::string& delimiter);
+    bool contains(const std::vector<unsigned int>& vec, unsigned int value);
 }
+

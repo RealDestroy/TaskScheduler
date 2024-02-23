@@ -24,6 +24,14 @@ Command::Command(Command_Type type, int device_id) {
 Command_Type Command::getCommandType() {
     return commandType;
 }
+int Command::getCommandTypeInt() {
+    if(commandType == OFF){
+        return 0;
+    } else if(commandType == ON) {
+        return 1;
+    }
+    return 2;
+}
 int Command::getDeviceId() const {
     return device_id;
 }
@@ -32,18 +40,7 @@ Command::Command() {
     device_id = -1;
     commandType = Toggle;
 }
-Command_Type Command::getType(const std::string& cmd_type) {
-    if(cmd_type == "Toggle") {
-        return Toggle;
-    }
-    if(cmd_type == "OFF") {
-        return OFF;
-    }
-    if(cmd_type == "ON") {
-        return OFF;
-    }
-    return Toggle;
-}
+
 
 /**
  * Sends the command via MQTT to the ESP32 to trigger the light
@@ -52,18 +49,32 @@ void Command::sendToMQTT() const {
     //more code
     std::cout << "Command sent via MQTT to device " << getDeviceId() << std::endl;
 }
+
+Command_Type Command::getCommandTypeOf(int command_type_int) {
+    if(command_type_int == 0) {
+        return Command_Type::OFF;
+    } else if(command_type_int == 1) {
+        return Command_Type::ON;
+    }
+    return Toggle;
+}
+
 ExecutableTask::ExecutableTask(unsigned int id, TimeInfo &execution_time, unsigned long long int interval, Command &command) {
     this->command = &command;
     this->id = getNextTaskID();
     this->interval = interval;
     this->id = id;
     this->execution_time = &execution_time;
+
     //catch up to current time
-    if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-        while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-            execution_time.modify(interval);
+    if(isRecurring()){
+        if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+            while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+                execution_time.modify(interval);
+            }
         }
     }
+
 }
 
 ExecutableTask::ExecutableTask(TimeInfo& execution_time, Command& command) {
@@ -77,9 +88,11 @@ ExecutableTask::ExecutableTask(TimeInfo& execution_time, unsigned long long inte
     this->interval = interval;
     this->execution_time = &execution_time;
     //catch up to current time
-    if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-        while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
-            execution_time.modify(interval);
+    if(isRecurring()){
+        if (execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+            while(execution_time.getEpoch() < getCurrentTime(getTimeZone())) {
+                execution_time.modify(interval);
+            }
         }
     }
 }
@@ -150,15 +163,10 @@ std::string ExecutableTask::string() const {
             + std::to_string(getTimeZone()) + ":"
             + std::to_string(getStartTime()) + ":"
             + std::to_string(getInterval()) + ":"
-            + std::to_string(getCommand()->getCommandType()) + ":"
+            + std::to_string(getCommand()->getCommandTypeInt()) + ":"
             + std::to_string(getCommand()->getDeviceId());
     return s;
 }
-
-
-
-
-
 
 
 //    auto target_time = std::chrono::system_clock::from_time_t(getStartTime());

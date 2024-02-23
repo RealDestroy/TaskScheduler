@@ -7,12 +7,13 @@
 #include <mutex>
 #include "Tasks.h"
 #include "rapidjson/document.h"
-#include "rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include <fstream>
-#include "JSONUtility.h"
+#include "SchedulerUtil.h"
 #include <algorithm>
 #include "filesystem"
+
 
 #ifndef TASKSCHEDULER_TASKSCHEDULER_H
 #define TASKSCHEDULER_TASKSCHEDULER_H
@@ -30,10 +31,11 @@ public:
     void save();
     static ExecutableTask parsePacket(std::string& packet);
     static std::string cwd();
-    void readInSchedules();
+    void retrieveLocalSchedules();
+    void retrieveCloudSchedules();
 private:
     void loop();
-    void task_handler() const;
+    void task_handler();
     std::mutex taskLock;
     std::vector<ExecutableTask*> tasks;
     std::vector<unsigned int> task_ids;
@@ -42,4 +44,5 @@ private:
     std::thread UTILITY_THREAD;
 protected:
     static std::string file();
+    static std::string local_file();
 };

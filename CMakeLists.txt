@@ -10,6 +10,6 @@ add_executable(TaskScheduler main.cpp
         SchedulerAPI/DateUtility.cpp
         SchedulerAPI/TaskScheduler.cpp
         SchedulerAPI/TaskScheduler.h
-        JSONUtility.cpp
-        SchedulerAPI/JSONUtility.h
+        SchedulerAPI/SchedulerUtil.cpp
+        SchedulerAPI/SchedulerUtil.h
 )
