@@ -15,5 +15,9 @@
 namespace SchedulerUtil {
     std::vector<std::string> split(const std::string& s, const std::string& delimiter);
     bool contains(const std::vector<unsigned int>& vec, unsigned int value);
+    const char* toChar(int i);
+    const char* toChar(long i);
+    const char* toChar(unsigned int i);
+    const char* toChar(unsigned long i);
 }
 

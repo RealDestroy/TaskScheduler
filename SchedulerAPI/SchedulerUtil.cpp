@@ -24,3 +24,16 @@ std::vector<std::string> SchedulerUtil::split(const std::string& s, const std::s
 bool SchedulerUtil::contains(const std::vector<unsigned int>& v, unsigned int value) {
     return (std::find(v.begin(), v.end(), value) != v.end());
 }
+
+const char* SchedulerUtil::toChar(int i){
+    return std::to_string(i).c_str();
+}
+const char* SchedulerUtil::toChar(long i){
+    return std::to_string(i).c_str();
+}
+const char* SchedulerUtil::toChar(unsigned int i){
+    return std::to_string(i).c_str();
+}
+const char* SchedulerUtil::toChar(unsigned long i){
+    return std::to_string(i).c_str();
+}

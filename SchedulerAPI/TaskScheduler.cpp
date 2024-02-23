@@ -147,9 +147,9 @@ void TaskScheduler::retrieveLocalSchedules() {
     if(document.HasMember(TASK_IDS) && document[TASK_IDS].IsUint()) {
         unsigned int length = document[TASK_IDS].GetUint();
         for(auto i = 0; i < length; i++) {
-
-            if(document.HasMember(std::to_string(i).c_str()) && document[std::to_string(i).c_str()].IsString()) {
-                std::string packet = document[std::to_string(i).c_str()].GetString();
+            const char* i_p = SchedulerUtil::toChar(i);
+            if(document.HasMember(i_p) && document[i_p].IsString()) {
+                std::string packet = document[i_p].GetString();
                 //parse packet
                 //"id:time_zone:start_time:interval:command_type:remote_device"
                 ExecutableTask task = TaskScheduler::parsePacket(packet);
