@@ -76,7 +76,11 @@ ExecutableTask::ExecutableTask(unsigned int id, TimeInfo &execution_time, unsign
     }
 
 }
-
+ExecutableTask::ExecutableTask(unsigned int id, TimeInfo &execution_time, Command &command) {
+    this->command = &command;
+    this->id = id;
+    this->execution_time = &execution_time;
+}
 ExecutableTask::ExecutableTask(TimeInfo& execution_time, Command& command) {
     this->command = &command;
     this->id = getNextTaskID();
@@ -167,6 +171,8 @@ std::string ExecutableTask::string() const {
             + std::to_string(getCommand()->getDeviceId());
     return s;
 }
+
+
 
 
 //    auto target_time = std::chrono::system_clock::from_time_t(getStartTime());

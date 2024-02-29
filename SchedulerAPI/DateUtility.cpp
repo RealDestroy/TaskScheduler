@@ -2,7 +2,10 @@
 // Created by Destroy on 2/8/2024.
 //
 
+#include <vector>
 #include "DateUtility.h"
+#include "SchedulerUtil.h"
+
 int getCurrentMonth() {
     time_t now = time(nullptr);
     struct tm *localTime = localtime(&now);
@@ -110,6 +113,16 @@ int TimeInfo::getTimeZone() const {
 
 void TimeInfo::modify(const unsigned long long add) {
     epoch += add;
+}
+
+TimeInfo::TimeInfo(std::string time, int day) {
+    std::vector<std::string> packet = SchedulerUtil::split(time,":");
+    int hours = std::stoi(packet[0]);
+    int minutes = std::stoi(packet[1]);
+    int seconds = std::stoi(packet[2]);
+    int month = getCurrentMonth();
+    int year = getCurrentYear();
+    int dayOfMonth = getNextMonthDay(day);
 }
 
 

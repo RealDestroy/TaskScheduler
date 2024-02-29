@@ -19,19 +19,19 @@ void TaskScheduler::loop() {
 }
 
 void TaskScheduler::task_handler() {
-    retrieveLocalSchedules();
-    //retrieveCloudSchedules();
+    //retrieveLocalSchedules();
+    retrieveCloudSchedules();
 
-    Command cmd1(Toggle,10);
-    Command cmd2(Toggle,11);
-    TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
-    TimeInfo time2 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
+    //Command cmd1(Toggle,10);
+    //Command cmd2(Toggle,11);
+    //TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
+    //TimeInfo time2 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
 
-    ExecutableTask t1(0,time1,10,cmd1);
-    ExecutableTask t2(1,time2,0,cmd2);
+    //ExecutableTask t1(0,time1,10,cmd1);
+    //ExecutableTask t2(1,time2,0,cmd2);
 
-    add(t1);
-    add(t2);
+    //add(t1);
+    //add(t2);
     //save();
 
     while(!HALT_SCHEDULER) {
@@ -179,67 +179,63 @@ void TaskScheduler::retrieveCloudSchedules() {
         return;
     }
 
-    for (Value::ConstMemberIterator itr = doc.MemberBegin(); itr != doc.MemberEnd(); ++itr){
-        //cout << itr->name.GetString() << endl;
-    }
+    //The system has a static ID which is created at first installation,
+    // this will be used to parse the json
+    const char* ID = "1";
+    const char* DEVICE_ID = "deviceID";
+    const char* SCHEDULES = "schedules";
+    int scheduleID, deviceID, day, action = 0;
 
-    /*
-    for (auto it : doc.FindMember("schedules")) {
-        cout << it->name.GetString() << endl;
+    if(doc.HasMember(ID) && doc[ID].IsArray()) {
+        //cout << ID << " is an array" << endl;
+        for(const auto& v : doc[ID].GetArray()) {
+            if(v.HasMember(DEVICE_ID) && v[DEVICE_ID].IsNumber()) {
+                //cout << "Has device id: " << v[DEVICE_ID].GetInt() << endl;
+            }
+            if(v.HasMember(SCHEDULES) && v[SCHEDULES].IsArray()) {
+                for(const auto& sc : v[SCHEDULES].GetArray()) {
+                    if(sc.IsObject()) {
+                        const auto& schedule = sc.GetObject();
 
-        if (it->name.IsNumber()) {
-            cout << "Key: " << it->name.GetString() << endl;
+                        if(schedule.HasMember("scheduleID") && schedule["scheduleID"].IsInt()) {
+                            scheduleID = schedule["scheduleID"].GetInt();
+                            //cout << "Has schedule id: " << schedule["scheduleID"].GetInt() << endl;
+                        }
+                        if(schedule.HasMember("deviceID") && schedule["deviceID"].IsInt()) {
+                            deviceID = schedule["deviceID"].GetInt();
+                            //cout << "Has device id: " << schedule["deviceID"].GetInt() << endl;
+                        }
+                        if(schedule.HasMember("dayOfWeek") && schedule["dayOfWeek"].IsInt()) {
+                            day = schedule["dayOfWeek"].GetInt();
+                            //cout << "Has day: " << schedule["dayOfWeek"].GetInt() << endl;
+                        }
+                        if(schedule.HasMember("action") && schedule["action"].IsInt()) {
+                            action = schedule["action"].GetInt();
+                            //cout << "Has action: " << schedule["action"].GetInt() << endl;
+                        }
+                        if(schedule.HasMember("time") && schedule["time"].IsString()) {
+                            std::string time = schedule["time"].GetString();
 
-            const Value& arr = it->value;
+                            TimeInfo t_info(time,day);
+                            Command command(Command::getCommandTypeOf(action),deviceID);
 
-            for (SizeType i = 0; i < arr.Size(); i++) {
-                const Value& obj = arr[i];
-
-                int deviceID = obj["deviceID"].GetInt();
-                cout << "  Device ID: " << deviceID << endl;
-
-                const Value& schedules = obj["schedules"];
-
-                for (SizeType j = 0; j < schedules.Size(); j++) {
-                    const Value &schedule = schedules[j];
-
-                    int scheduleID = schedule["scheduleID"].GetInt();
-                    int dayOfWeek = schedule["dayOfWeek"].GetInt();
-                    const string &time = schedule["time"].GetString();
-                    //convert from "08:00:00", to epoch time
-                    std::vector<std::string> packet = SchedulerUtil::split(time,":");
-                    int hours = std::stoi(packet[0]);
-                    int minutes = std::stoi(packet[1]);
-                    int seconds = std::stoi(packet[2]);
-                    int month = getCurrentMonth();
-                    int year = getCurrentYear();
-                    int dayOfMonth = getNextMonthDay(dayOfWeek);
-                    int action = schedule["action"].GetInt();
-
-                    TimeInfo t_info(year,month,dayOfMonth,hours,minutes,seconds,CST);
-                    Command command(Command::getCommandTypeOf(action),scheduleID);
-
-
-                    ExecutableTask task(t_info,command);
-
-                    cout << task.string() << endl;
-
-                    add(task);
-
+                            ExecutableTask task(scheduleID,t_info,command);
+                            cout << task.string() << endl;
+                            //add the task to the loop
+                            //cout << "Has time: " << schedule["time"].GetString() << endl;
+                        }
+                    }
                 }
             }
         }
-
-
     }
-     */
 }
 
 std::string TaskScheduler::file() {
-    return TaskScheduler::cwd() + R"(\SchedulerAPI\schedules\schedules.json)";
+    return TaskScheduler::cwd() + R"(/SchedulerAPI/schedules/schedules.json)";
 }
 std::string TaskScheduler::local_file() {
-    return TaskScheduler::cwd() + R"(\SchedulerAPI\schedules\local_schedules.json)";
+    return TaskScheduler::cwd() + R"(/SchedulerAPI/schedules/local_schedules.json)";
 }
 
 

@@ -96,6 +96,7 @@ class TimeInfo {
 public:
     TimeInfo();
     explicit TimeInfo(int timezone);
+    TimeInfo(std::string time, int day);
     TimeInfo(unsigned long long epoch, int timezone);
     TimeInfo(int day,int hour,int min,int sec,int timezone);
     TimeInfo(int year,int month,int day,int hour,int min,int sec,int tzone);

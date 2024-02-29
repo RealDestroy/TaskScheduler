@@ -39,6 +39,7 @@ private:
 class ExecutableTask {
 public:
     ExecutableTask(TimeInfo& execution_time,Command& command);
+    ExecutableTask(unsigned int id, TimeInfo& execution_time,Command& command);
     ExecutableTask(TimeInfo& execution_time,unsigned long long interval,Command& command);
     ExecutableTask(unsigned int id, TimeInfo& execution_time,unsigned long long interval,Command& command);
     unsigned int getId() const;
