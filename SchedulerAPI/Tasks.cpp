@@ -59,6 +59,8 @@ Command_Type Command::getCommandTypeOf(int command_type_int) {
     return Toggle;
 }
 
+
+
 ExecutableTask::ExecutableTask(unsigned int id, TimeInfo &execution_time, unsigned long long int interval, Command &command) {
     this->command = &command;
     this->id = getNextTaskID();

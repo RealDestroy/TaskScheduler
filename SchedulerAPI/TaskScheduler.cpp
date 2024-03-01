@@ -2,7 +2,6 @@
 // Created by destroy on 2/10/24.
 //
 
-
 #include "TaskScheduler.h"
 
 
@@ -13,15 +12,20 @@ void TaskScheduler::loop() {
             if(task->canExecute()) {
                 task->execute();
             }
+            if(task->isComplete() || task->isCancelled()) {
+                std::destroy_at(task);
+                //remove any null tasks
+                tasks.erase( std::remove( std::begin(tasks), std::end(tasks), nullptr ), std::end(tasks));
+            }
         }
         std::this_thread::sleep_for(std::chrono::seconds(5)); //sleep loop for 1 second
     }
 }
 
 void TaskScheduler::task_handler() {
-    //retrieveLocalSchedules();
+    using namespace std;
+    retrieveLocalSchedules();
     retrieveCloudSchedules();
-
     //Command cmd1(Toggle,10);
     //Command cmd2(Toggle,11);
     //TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
@@ -32,15 +36,17 @@ void TaskScheduler::task_handler() {
 
     //add(t1);
     //add(t2);
-    //save();
+    save();
 
     while(!HALT_SCHEDULER) {
         std::this_thread::sleep_for(std::chrono::seconds(10)); //sleep loop for 10 second
-        //save();
-        //retrieveCloudSchedules();
+        bool new_data = retrieveCloudSchedules(); //get all cloud schedules and return how many were new
+        if(new_data) {
+            save();
+            cout << "Saved new data" << endl;
+        }
     }
 }
-
 
 void TaskScheduler::start() {
     UTILITY_THREAD = std::thread(&TaskScheduler::task_handler,this);
@@ -51,11 +57,11 @@ void TaskScheduler::start() {
 void TaskScheduler::stop() {
     HALT_SCHEDULER = true;
 }
-void TaskScheduler::add(ExecutableTask& task ) {
+bool TaskScheduler::add(ExecutableTask& task ) {
     unsigned int id = task.getId();
     if(SchedulerUtil::contains(task_ids,id)) {
-        std::cout << "already added " << id << std::endl;
-        return;
+        //std::cout << "already added " << id << std::endl;
+        return false;
     }
 
     taskLock.lock();
@@ -63,6 +69,7 @@ void TaskScheduler::add(ExecutableTask& task ) {
     task_ids.push_back(task.getId());
     std::cout << "added " << task.getId() << std::endl;
     taskLock.unlock();
+    return true;
 }
 
 
@@ -159,14 +166,14 @@ void TaskScheduler::retrieveLocalSchedules() {
         }
     }
 }
-void TaskScheduler::retrieveCloudSchedules() {
+bool TaskScheduler::retrieveCloudSchedules() {
     using namespace std;
     using namespace rapidjson;
     std::ifstream file(TaskScheduler::file());
 
     if (!file.is_open()) {
         std::cerr << "Error: Unable to open file " << TaskScheduler::file() << std::endl;
-        return;
+        return false;
     }
 
     // Read the entire file content into a string
@@ -176,7 +183,7 @@ void TaskScheduler::retrieveCloudSchedules() {
     rapidjson::Document doc;
     if (doc.Parse(jsonContent.c_str()).HasParseError()) {
         std::cerr << "Error: Failed to parse JSON" << std::endl;
-        return;
+        return false;
     }
 
     //The system has a static ID which is created at first installation,
@@ -185,7 +192,7 @@ void TaskScheduler::retrieveCloudSchedules() {
     const char* DEVICE_ID = "deviceID";
     const char* SCHEDULES = "schedules";
     int scheduleID, deviceID, day, action = 0;
-
+    int new_schedules = 0;
     if(doc.HasMember(ID) && doc[ID].IsArray()) {
         //cout << ID << " is an array" << endl;
         for(const auto& v : doc[ID].GetArray()) {
@@ -220,22 +227,28 @@ void TaskScheduler::retrieveCloudSchedules() {
                             Command command(Command::getCommandTypeOf(action),deviceID);
 
                             ExecutableTask task(scheduleID,t_info,command);
-                            cout << task.string() << endl;
+                            //
                             //add the task to the loop
                             //cout << "Has time: " << schedule["time"].GetString() << endl;
+                            bool n = add(task);
+                            new_schedules += add(task);
+                            if(n) {
+                                cout << task.string() << endl;
+                            }
                         }
                     }
                 }
             }
         }
     }
+    return new_schedules > 0;
 }
 
 std::string TaskScheduler::file() {
-    return TaskScheduler::cwd() + R"(/SchedulerAPI/schedules/schedules.json)";
+    return TaskScheduler::cwd() + R"(\SchedulerAPI\schedules\schedules.json)";
 }
 std::string TaskScheduler::local_file() {
-    return TaskScheduler::cwd() + R"(/SchedulerAPI/schedules/local_schedules.json)";
+    return TaskScheduler::cwd() + R"(\SchedulerAPI\\schedules\local_schedules.json)";
 }
 
 

@@ -60,7 +60,7 @@ private:
     unsigned long id;
     Command* command;
     TimeInfo* execution_time;
-    unsigned long interval{};
+    unsigned long interval;
     bool complete = false;
     bool cancelled = false;
 };

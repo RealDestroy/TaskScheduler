@@ -12,6 +12,7 @@
 #include <fstream>
 #include "SchedulerUtil.h"
 #include <algorithm>
+#include <list>
 #include "filesystem"
 
 
@@ -25,14 +26,14 @@
 
 class TaskScheduler {
 public:
-    void add(ExecutableTask& task);
+    bool add(ExecutableTask& task);
     void start();
     void stop();
     void save();
     static ExecutableTask parsePacket(std::string& packet);
     static std::string cwd();
     void retrieveLocalSchedules();
-    void retrieveCloudSchedules();
+    bool retrieveCloudSchedules();
 private:
     void loop();
     void task_handler();
