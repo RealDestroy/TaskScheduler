@@ -31,27 +31,27 @@ void TaskScheduler::loop() {
 
 void TaskScheduler::task_handler() {
     using namespace std;
-    retrieveLocalSchedules();
-    retrieveCloudSchedules();
-    //Command cmd1(Toggle,10);
-    //Command cmd2(Toggle,11);
-    //TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
-    //TimeInfo time2 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
+    //retrieveLocalSchedules();
+    //retrieveCloudSchedules();
+    Command cmd1(Toggle,10);
+    Command cmd2(Toggle,11);
+    TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
+    TimeInfo time2 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
 
-    //ExecutableTask t1(0,time1,10,cmd1);
-    //ExecutableTask t2(1,time2,0,cmd2);
+    ExecutableTask t1(0,time1,10,cmd1);
+    ExecutableTask t2(1,time2,0,cmd2);
 
-    //add(t1);
-    //add(t2);
+    add(t1);
+    add(t2);
     save();
 
     while(!HALT_SCHEDULER) {
         std::this_thread::sleep_for(std::chrono::seconds(10)); //sleep loop for 10 second
-        bool new_data = retrieveCloudSchedules(); //get all cloud schedules and return how many were new
-        if(new_data) {
-            save();
-            cout << "Saved new data" << endl;
-        }
+        //bool new_data = retrieveCloudSchedules(); //get all cloud schedules and return how many were new
+        //if(new_data) {
+            //save();
+            //cout << "Saved new data" << endl;
+        //}
     }
 }
 
