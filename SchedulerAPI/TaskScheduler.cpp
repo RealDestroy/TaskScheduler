@@ -1,6 +1,13 @@
 //
 // Created by destroy on 2/10/24.
 //
+#ifdef _WIN32
+#define LINUX false
+#endif
+
+#ifdef __unix__
+#define LINUX true
+#endif
 
 #include "TaskScheduler.h"
 
@@ -245,10 +252,18 @@ bool TaskScheduler::retrieveCloudSchedules() {
 }
 
 std::string TaskScheduler::file() {
-    return TaskScheduler::cwd() + R"(\SchedulerAPI\schedules\schedules.json)";
+    if(LINUX) {
+        return TaskScheduler::cwd() + R"(\SchedulerAPI\schedules\schedules.json)";
+    } else {
+        return TaskScheduler::cwd() + R"(/SchedulerAPI/schedules/schedules.json)";
+    }
+
 }
 std::string TaskScheduler::local_file() {
-    return TaskScheduler::cwd() + R"(\SchedulerAPI\\schedules\local_schedules.json)";
+    if(LINUX) { //check if system is linux or windows (slash compatibility for files)
+        return TaskScheduler::cwd() + R"(\SchedulerAPI\schedules\local_schedules.json)";
+    } else {
+        return TaskScheduler::cwd() + R"(/SchedulerAPI/schedules/local_schedules.json)";
+    }
 }
-
 
