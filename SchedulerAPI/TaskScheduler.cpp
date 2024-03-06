@@ -9,30 +9,19 @@
 #define LINUX true
 #endif
 
+#define TICK 1
+
 #include "TaskScheduler.h"
 
 
-void TaskScheduler::loop() {
-    while(!HALT_SCHEDULER) {
-        for(auto& task :  TaskScheduler::tasks) {
-            std::cout << task->string() << std::endl;
-            if(task->canExecute()) {
-                task->execute();
-            }
-            if(task->isComplete() || task->isCancelled()) {
-                std::destroy_at(task);
-                //remove any null tasks
-                tasks.erase( std::remove( std::begin(tasks), std::end(tasks), nullptr ), std::end(tasks));
-            }
-        }
-        std::this_thread::sleep_for(std::chrono::seconds(5)); //sleep loop for 1 second
-    }
-}
 
 void TaskScheduler::task_handler() {
     using namespace std;
+    //import local saved schedules and check for cloud schedules
     //retrieveLocalSchedules();
     //retrieveCloudSchedules();
+
+    //add fake tasks for testing
     Command cmd1(Toggle,10);
     Command cmd2(Toggle,11);
     TimeInfo time1 = TimeInfo(2024,FEBRUARY,12,1,0,0,CST);
@@ -45,21 +34,33 @@ void TaskScheduler::task_handler() {
     add(t2);
     save();
 
+    unsigned short counter = 0;
     while(!HALT_SCHEDULER) {
-        std::this_thread::sleep_for(std::chrono::seconds(10)); //sleep loop for 10 second
-        //bool new_data = retrieveCloudSchedules(); //get all cloud schedules and return how many were new
-        //if(new_data) {
+        counter ++;
+        for(auto& task :  TaskScheduler::tasks) {
+            //std::cout << task->string() << std::endl;
+            if(task->canExecute()) {
+                task->execute();
+            }
+            if(task->isComplete() || task->isCancelled()) {
+                std::destroy_at(task);
+                //remove any null tasks
+                tasks.erase( std::remove( std::begin(tasks), std::end(tasks), nullptr ), std::end(tasks));
+            }
+        }
+        //check for new schedules every 60 ticks
+        if(counter == TICK * 60) {
+            counter = 0;
+            //retrieveCloudSchedules();
             //save();
-            //cout << "Saved new data" << endl;
-        //}
+        }
+        sleep(TICK);
     }
+
 }
 
 void TaskScheduler::start() {
-    UTILITY_THREAD = std::thread(&TaskScheduler::task_handler,this);
-    MAIN_THREAD = std::thread(&TaskScheduler::loop,this);
-    MAIN_THREAD.join(); //wait until thread ends (never unless stopped manually)
-    UTILITY_THREAD.join(); //ends when MAIN_THREAD ends
+    task_handler();
 }
 void TaskScheduler::stop() {
     HALT_SCHEDULER = true;
@@ -71,11 +72,9 @@ bool TaskScheduler::add(ExecutableTask& task ) {
         return false;
     }
 
-    taskLock.lock();
     tasks.push_back(&task);
     task_ids.push_back(task.getId());
     std::cout << "added " << task.getId() << std::endl;
-    taskLock.unlock();
     return true;
 }
 

@@ -3,8 +3,6 @@
 //
 #pragma once
 #include <vector>
-#include <thread>
-#include <mutex>
 #include "Tasks.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
@@ -37,12 +35,9 @@ public:
 private:
     void loop();
     void task_handler();
-    std::mutex taskLock;
     std::vector<ExecutableTask*> tasks;
     std::vector<unsigned int> task_ids;
     bool HALT_SCHEDULER = false;
-    std::thread MAIN_THREAD;
-    std::thread UTILITY_THREAD;
 protected:
     static std::string file();
     static std::string local_file();
